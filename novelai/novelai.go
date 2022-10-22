@@ -1,6 +1,7 @@
 package novelai
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -30,46 +31,54 @@ type Comment struct {
 	UndesiredContent string  `json:"uc"`
 }
 
-func CheckImage(cCtx *cli.Context) error {
+func CheckFile(cCtx *cli.Context) error {
 	fileName := cCtx.Args().Get(0)
-
 	f, err := os.ReadFile(fileName)
 	if err != nil {
-		return err
+		return cli.Exit(err.Error(), 1)
 	}
-	str := string(f)
 
+	result, err := getResult(f)
+	if err != nil {
+		return cli.Exit(err.Error(), 1)
+	}
+
+	// print
+	fmt.Println("Prompt:", result.Prompt)
+	fmt.Println("Undesired Content:", result.Comment.UndesiredContent)
+	fmt.Println("Steps:", result.Comment.Steps)
+	fmt.Println("Scale:", result.Comment.Scale)
+	fmt.Println("Seed:", result.Comment.Seed)
+	fmt.Println("Sampling:", result.Comment.Sampler)
+	fmt.Println("(hidden) Strength:", result.Comment.Strength)
+	fmt.Println("(hidden) Noise:", result.Comment.Noise)
+
+	return nil
+}
+
+func getResult(f []byte) (*Result, error) {
+	var result = &Result{}
+	str := string(f)
 	isNovelAIImage := strings.Contains(str, aiGeneratedSignature)
 	if isNovelAIImage {
+		// get description
 		descStartIdx := strings.Index(str, descriptionStart) + len(descriptionStart) + 1
 		descEndIdx := strings.Index(str, descriptionEnd)
 		prompt := string(f[descStartIdx : descEndIdx-len(descriptionEnd)])
-
+		// get comment
 		cmtStartIdx := strings.Index(str, commentStart) + len(commentStart) + 1
 		cmtEndIdx := strings.Index(str, commentEnd)
 		jsonData := string(f[cmtStartIdx : cmtEndIdx-len(commentEnd)])
-
+		// set
 		var comment Comment
 		err := json.Unmarshal([]byte(jsonData), &comment)
 		if err != nil {
-			return err
+			return nil, err
 		}
-
-		var result = Result{Prompt: prompt, Comment: comment}
-
-		fmt.Println("Prompt:", result.Prompt)
-		fmt.Println("Undesired Content:", result.Comment.UndesiredContent)
-		fmt.Println("Steps:", result.Comment.Steps)
-		fmt.Println("Scale:", result.Comment.Scale)
-		fmt.Println("Seed:", result.Comment.Seed)
-		fmt.Println("Sampling:", result.Comment.Sampler)
-
-		fmt.Println("(hidden) Strength:", result.Comment.Strength)
-		fmt.Println("(hidden) Noise:", result.Comment.Noise)
-
+		result.Prompt = prompt
+		result.Comment = comment
 	} else {
-		return cli.Exit("this image does not have an AI generated image signature!", 1)
+		return nil, errors.New("this image does not have an AI generated image signature")
 	}
-
-	return nil
+	return result, nil
 }
