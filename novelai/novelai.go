@@ -11,9 +11,9 @@ import (
 )
 
 const aiGeneratedSignature = "AI generated image"
-const descriptionStart = "tEXtDescription"
+const descriptionStart = "TXtDescription"
 const descriptionEnd = string(uint8(00)) + string(uint8(00)) + string(uint8(00)) + string(uint8(16))
-const commentStart = "tEXtComment"
+const commentStart = "EXtComment"
 const commentEnd = string(uint8(00)) + string(uint8(01)) + string(uint8(00)) + string(uint8(00))
 
 type Result struct {
