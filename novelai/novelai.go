@@ -11,7 +11,7 @@ import (
 )
 
 const aiGeneratedSignature = "AI generated image"
-const descriptionStart = "TXtDescription"
+const descriptionStart = "Description"
 const descriptionEnd = string(uint8(00)) + string(uint8(00)) + string(uint8(00)) + string(uint8(16))
 const commentStart = "EXtComment"
 const commentEnd = string(uint8(00)) + string(uint8(01)) + string(uint8(00)) + string(uint8(00))
