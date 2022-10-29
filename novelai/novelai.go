@@ -3,6 +3,9 @@ package novelai
 import (
 	"errors"
 	"fmt"
+	"image"
+	_ "image/jpeg"
+	_ "image/png"
 	"os"
 	"strings"
 
@@ -52,6 +55,18 @@ func CheckFile(cCtx *cli.Context) error {
 	fmt.Println("Sampling:", result.Comment.Sampler)
 	fmt.Println("(hidden) Strength:", result.Comment.Strength)
 	fmt.Println("(hidden) Noise:", result.Comment.Noise)
+
+	// img size
+	reader, err := os.Open(fileName)
+	if err != nil {
+		return cli.Exit(err.Error(), 1)
+	}
+	defer reader.Close()
+	img, _, err := image.DecodeConfig(reader)
+	if err != nil {
+		return cli.Exit(err.Error(), 1)
+	}
+	fmt.Println("Size:", img.Width, "x", img.Height)
 
 	return nil
 }
