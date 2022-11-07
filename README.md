@@ -7,6 +7,6 @@ go run main.go image.png
 or
 
 ```bash
-go build
-./novelai-reveal image.png
+make
+./bin/novelai-reveal image.png
 ```
