@@ -1,5 +1,7 @@
 # novelai-reveal
 
+specifies a directory and reveals images
+
 ```bash
 go run main.go <your-image-directory>
 ```
