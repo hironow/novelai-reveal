@@ -13,7 +13,7 @@ func main() {
 		Name:    "novelai-reveal",
 		Version: "v0.0.1",
 		Usage:   "reveal NovelAI images!",
-		Action:  novelai.CheckFile,
+		Action:  novelai.CheckDirectory,
 		Suggest: true,
 	}
 

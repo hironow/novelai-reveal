@@ -6,12 +6,20 @@ import (
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
+	"io/fs"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/goccy/go-json"
 	"github.com/urfave/cli/v2"
 )
+
+// NOTE: NovelAI inside prompt
+// const defaultPrompt = "masterpiece, best quality, "
+// const noneUndesiredContext = "lowres"
+// const lowQualityUndesiredContext = "nsfw, lowres, text, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry"
+// const lowQualityAndBadAnatomyUndesiredContext = "nsfw, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry"
 
 const aiGeneratedSignature = "AI generated image"
 const descriptionStart = "Description"
@@ -34,8 +42,33 @@ type Comment struct {
 	UndesiredContent string  `json:"uc"`
 }
 
-func CheckFile(cCtx *cli.Context) error {
-	fileName := cCtx.Args().Get(0)
+func CheckDirectory(cCtx *cli.Context) error {
+	dirName := cCtx.Args().Get(0)
+	err := filepath.WalkDir(dirName, func(path string, info fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+
+		fmt.Println(info.Name())
+		err = checkFile(path)
+		if err != nil {
+			return err
+		}
+		fmt.Println("")
+
+		return nil
+	})
+	if err != nil {
+		return cli.Exit(err.Error(), 1)
+	}
+
+	return nil
+}
+
+func checkFile(fileName string) error {
 	f, err := os.ReadFile(fileName)
 	if err != nil {
 		return cli.Exit(err.Error(), 1)

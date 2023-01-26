@@ -1,12 +1,12 @@
 # novelai-reveal
 
 ```bash
-go run main.go image.png
+go run main.go <your-image-directory>
 ```
 
 or
 
 ```bash
 make
-./bin/novelai-reveal image.png
+./bin/novelai-reveal <your-image-directory>
 ```
